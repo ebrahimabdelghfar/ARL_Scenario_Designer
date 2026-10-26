@@ -4,7 +4,7 @@ ObjectTree — QTreeWidget showing the scenario object hierarchy.
 
 from PyQt5.QtWidgets import QTreeWidget, QTreeWidgetItem, QMenu
 from PyQt5.QtCore import pyqtSignal, Qt
-from PyQt5.QtGui import QColor, QBrush
+from PyQt5.QtGui import QColor, QBrush, QIcon
 
 from . import theme
 
@@ -41,7 +41,8 @@ class ObjectTree(QTreeWidget):
         self._nodes = {}
         for key, label, icon_name, color in CATEGORIES:
             node = QTreeWidgetItem(self, [label])
-            node.setIcon(0, theme.icon(icon_name, color))
+            # Off-state only: expanded tree nodes would otherwise show the dark On (checked) glyph.
+            node.setIcon(0, QIcon(theme.icon(icon_name, color).pixmap(36, 36)))
             node.setFlags(Qt.ItemIsEnabled)
             font = node.font(0)
             font.setBold(True)
@@ -75,7 +76,7 @@ class ObjectTree(QTreeWidget):
                       "ego", project.ego, colors["ego"])
             if project.ego.goal:
                 goal = self._add(self._ego_node, "Goal Point", "ego_goal", project.ego, "#00C850")
-                goal.setIcon(0, theme.icon("flag", "#00C850"))
+                goal.setIcon(0, QIcon(theme.icon("flag", "#00C850").pixmap(36, 36)))
         for npc in project.npc_vehicles:
             parked = "  ·  parked" if npc.parked else ""
             self._add(self._npc_node, f"{npc.name}  ·  {npc.model.split('.')[-1]}{parked}", "npc", npc, colors["npc"])

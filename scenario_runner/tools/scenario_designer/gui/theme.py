@@ -1,20 +1,21 @@
 """
-Theme — Micropolis design tokens, Qt stylesheet, SVG icons and the logo.
+Theme — ARL design tokens, Qt stylesheet, SVG icons and the logo.
 
-Brand color is sampled from logo/images.jpeg. Icons are Lucide-style strokes
+Brand color is sampled from logo/arl.png. Icons are Lucide-style strokes
 (24x24 viewBox) rendered through QtSvg, so no emoji / icon font dependency.
 """
 
 import os
 from functools import lru_cache
 
-from PyQt5.QtCore import QByteArray, QRectF, Qt
-from PyQt5.QtGui import (QColor, QFont, QFontDatabase, QIcon, QPainter, QPainterPath,
-                         QPalette, QPixmap)
+from PyQt5.QtCore import QByteArray, QRect, Qt
+from PyQt5.QtGui import QColor, QFont, QFontDatabase, QIcon, QPainter, QPalette, QPixmap
 from PyQt5.QtSvg import QSvgRenderer
 
 LOGO_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__),
-                                         "..", "..", "..", "logo", "images.jpeg"))
+                                         "..", "..", "..", "logo", "arl.png"))
+# Car-in-ring mark on the left of the wordmark; the black text is unreadable on the dark UI.
+LOGO_MARK = QRect(0, 0, 148, 136)
 
 T = {
     "bg":          "#0F1720",
@@ -24,9 +25,11 @@ T = {
     "border":      "#2C3B47",
     "text":        "#E6EDF2",
     "muted":       "#93A4B1",
-    "brand":       "#36768F",
-    "brand_hover": "#4A90A8",
-    "ring":        "#5FB3CE",
+    "brand":       "#00D77C",
+    "brand_hover": "#3BE39A",
+    "on_brand":    "#03140B",   # white on #00D77C is ~2:1, near-black is ~11:1
+    "brand_soft":  "rgba(0, 215, 124, 56)",
+    "ring":        "#7CF0BE",
     "danger":      "#E5484D",
     "warn":        "#F5A524",
     "ok":          "#30A46C",
@@ -77,29 +80,20 @@ def _render(name, color, px=48):
 
 @lru_cache(maxsize=None)
 def icon(name, color=None):
-    """QIcon for a named glyph; checked (On) state renders white."""
+    """QIcon for a named glyph; checked (On) state renders on_brand."""
     ic = QIcon()
     ic.addPixmap(_render(name, color or T["text"]), QIcon.Normal, QIcon.Off)
-    ic.addPixmap(_render(name, "#FFFFFF"), QIcon.Normal, QIcon.On)
+    ic.addPixmap(_render(name, T["on_brand"]), QIcon.Normal, QIcon.On)
     ic.addPixmap(_render(name, T["border"]), QIcon.Disabled, QIcon.Off)
     return ic
 
 
-def logo_pixmap(size=28, radius=6):
-    """Micropolis logo scaled to size, with rounded corners (null pixmap if missing)."""
+def logo_pixmap(size=28):
+    """ARL logo mark scaled to size (null pixmap if missing)."""
     src = QPixmap(LOGO_PATH)
     if src.isNull():
         return src
-    src = src.scaled(size * 2, size * 2, Qt.KeepAspectRatio, Qt.SmoothTransformation)
-    out = QPixmap(src.size())
-    out.fill(Qt.transparent)
-    p = QPainter(out)
-    p.setRenderHint(QPainter.Antialiasing)
-    path = QPainterPath()
-    path.addRoundedRect(QRectF(out.rect()), radius * 2, radius * 2)
-    p.setClipPath(path)
-    p.drawPixmap(0, 0, src)
-    p.end()
+    out = src.copy(LOGO_MARK).scaled(size * 2, size * 2, Qt.KeepAspectRatio, Qt.SmoothTransformation)
     out.setDevicePixelRatio(2.0)
     return out
 
@@ -124,7 +118,7 @@ QMenuBar::item {{ padding: 4px 10px; border-radius: 4px; background: transparent
 QMenuBar::item:selected {{ background: {hover}; }}
 QMenu {{ background: {surface}; border: 1px solid {border}; padding: 4px; }}
 QMenu::item {{ padding: 6px 28px 6px 12px; border-radius: 4px; }}
-QMenu::item:selected {{ background: {brand}; color: white; }}
+QMenu::item:selected {{ background: {brand_soft}; color: {text}; }}
 QMenu::item:disabled {{ color: {muted}; }}
 QMenu::separator {{ height: 1px; background: {border}; margin: 4px 6px; }}
 QMenu::icon {{ padding-left: 8px; }}
@@ -134,10 +128,10 @@ QToolBar::separator {{ background: {border}; width: 1px; margin: 6px 6px; }}
 QToolButton {{ background: transparent; border: 1px solid transparent; border-radius: 6px; padding: 5px 8px; }}
 QToolButton:hover {{ background: {hover}; }}
 QToolButton:pressed {{ background: {border}; }}
-QToolButton:checked {{ background: {brand}; color: white; border-color: {brand_hover}; }}
+QToolButton:checked {{ background: {brand}; color: {on_brand}; border-color: {brand_hover}; }}
 QToolButton:focus {{ border-color: {ring}; }}
 QToolButton:disabled {{ color: {border}; }}
-QToolButton#primary {{ background: {brand}; color: white; font-weight: 600; padding: 5px 14px; }}
+QToolButton#primary {{ background: {brand}; color: {on_brand}; font-weight: 600; padding: 5px 14px; }}
 QToolButton#primary:hover {{ background: {brand_hover}; }}
 QLabel#brand {{ font-size: 14px; font-weight: 700; padding: 0 10px 0 4px; }}
 QLabel#muted {{ color: {muted}; }}
@@ -147,7 +141,7 @@ QDockWidget::title {{ background: {surface}; padding: 6px 10px; border-bottom: 1
 QTreeWidget, QListWidget {{ background: {surface}; border: none; outline: 0; }}
 QTreeWidget::item, QListWidget::item {{ padding: 4px 2px; border-radius: 4px; }}
 QTreeWidget::item:hover, QListWidget::item:hover {{ background: {hover}; }}
-QTreeWidget::item:selected, QListWidget::item:selected {{ background: {brand}; color: white; }}
+QTreeWidget::item:selected, QListWidget::item:selected {{ background: {brand_soft}; color: {text}; }}
 QHeaderView::section {{ background: {surface}; color: {muted}; border: none; padding: 4px; }}
 
 QScrollArea {{ border: none; background: {surface}; }}
@@ -170,7 +164,7 @@ QAbstractSpinBox::down-button {{ subcontrol-position: bottom right; border-botto
 QAbstractSpinBox::up-button:hover, QAbstractSpinBox::down-button:hover {{ background: {hover}; }}
 QAbstractSpinBox::up-arrow {{ image: url({assets}/up.svg); width: 9px; height: 9px; }}
 QAbstractSpinBox::down-arrow {{ image: url({assets}/down.svg); width: 9px; height: 9px; }}
-QComboBox QAbstractItemView {{ background: {surface}; border: 1px solid {border}; selection-background-color: {brand}; }}
+QComboBox QAbstractItemView {{ background: {surface}; border: 1px solid {border}; selection-background-color: {brand_soft}; selection-color: {text}; }}
 QCheckBox {{ spacing: 8px; }}
 QCheckBox::indicator {{ width: 14px; height: 14px; border: 1px solid {muted}; border-radius: 3px; background: {surface2}; }}
 QCheckBox::indicator:hover, QCheckBox::indicator:focus {{ border-color: {ring}; }}
@@ -181,7 +175,7 @@ QPushButton {{ background: {surface2}; border: 1px solid {border}; border-radius
 QPushButton:hover {{ background: {hover}; border-color: {muted}; }}
 QPushButton:focus {{ border-color: {ring}; }}
 QPushButton:disabled {{ color: {border}; border-color: {surface2}; }}
-QPushButton:default, QPushButton#primary {{ background: {brand}; border-color: {brand}; color: white; }}
+QPushButton:default, QPushButton#primary {{ background: {brand}; border-color: {brand}; color: {on_brand}; }}
 QPushButton:default:hover, QPushButton#primary:hover {{ background: {brand_hover}; }}
 QPushButton#danger {{ background: transparent; border-color: {danger}; color: {danger}; }}
 QPushButton#danger:hover {{ background: {danger}; color: white; }}
@@ -211,11 +205,11 @@ def apply(app):
                       (QPalette.ButtonText, "text"), (QPalette.BrightText, "danger"),
                       (QPalette.Link, "ring"), (QPalette.Highlight, "brand")]:
         pal.setColor(role, QColor(T[key]))
-    pal.setColor(QPalette.HighlightedText, QColor("#FFFFFF"))
+    pal.setColor(QPalette.HighlightedText, QColor(T["on_brand"]))
     pal.setColor(QPalette.Disabled, QPalette.Text, QColor(T["muted"]))
     pal.setColor(QPalette.Disabled, QPalette.ButtonText, QColor(T["muted"]))
     app.setPalette(pal)
     app.setStyleSheet(QSS)
-    logo = QPixmap(LOGO_PATH)
+    logo = logo_pixmap(64)
     if not logo.isNull():
         app.setWindowIcon(QIcon(logo))

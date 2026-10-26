@@ -17,3 +17,4 @@ results*.txt
 *.dot
 .venv
 !tools/scenario_designer/gui/assets/*.svg
+!logo/*.png

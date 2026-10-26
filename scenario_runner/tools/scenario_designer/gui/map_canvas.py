@@ -48,7 +48,7 @@ JUNCTION_CLOSE_GAP = 2.5  # m: widest corner gap paved inside junctions
 # Size of actor markers (in world meters, scaled by pixels_per_meter)
 ACTOR_SIZE = 3.0
 TRIGGER_SIZE = 4.0
-SELECT_RING = QColor(95, 179, 206)
+SELECT_RING = QColor(124, 240, 190)
 
 # Placement-mode hints shown in the on-canvas pill
 MODE_HINTS = {
@@ -513,7 +513,7 @@ class MapCanvas(QGraphicsView):
                                    " padding: 4px 8px; font-size: 11px;")
 
         self._mode_pill = overlay()
-        self._mode_pill.setStyleSheet("background: #36768F; color: white; border-radius: 12px;"
+        self._mode_pill.setStyleSheet("background: #00D77C; color: #03140B; border-radius: 12px;"
                                       " padding: 4px 14px; font-weight: 600;")
         self._mode_pill.hide()
         self._layout_overlays()

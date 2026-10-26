@@ -7,7 +7,9 @@ YELLOW := \033[1;33m
 NC := \033[0m
 
 AUTO_START?=false
-CONFIG?=$(WORKSPACE)/config/carla_default_interface_config.yaml
+CONFIG?=$(WORKSPACE)/config/carla_interface_config.yaml
+ROS_SETUP?=/opt/ros/humble/setup.bash
+CARLA_PYAPI?=$(WORKSPACE)/ASU_RT_Carla/PythonAPI/carla
 GPUS?=all
 export GPUS
 DOCKER_COMPOSE ?= $(shell if docker compose version >/dev/null 2>&1; then echo "docker compose"; else echo "docker-compose"; fi)
@@ -17,6 +19,9 @@ CARLA_AS_USER := sudo -u developer
 else
 CARLA_AS_USER :=
 endif
+kill_stale_sim:
+	@pkill -9 -f '[C]arlaUE4' >/dev/null 2>&1 || true
+	@for i in $$(seq 1 20); do nc -z localhost 2000 >/dev/null 2>&1 || break; sleep 1; done
 download_carla_assets:
 	@bash scripts/download_assests/download_carla_asurt.sh
 launch_designer: kill_stale_sim
@@ -42,6 +47,6 @@ list_scenarios:
 	@cd $(WORKSPACE)/scenario_runner && python3 -c "from srunner.tools.scenario_parser import ScenarioConfigurationParser as P; \
 	print(*P.get_list_of_scenarios(''), sep='\n')"
 run_csv_scenarios_standalone:
-	@source install/ros_apps/setup.bash && \
+	@source $(ROS_SETUP) && \
 	PYTHONPATH=$(CARLA_PYAPI):$$PYTHONPATH python3 scenario_runner/run_csv_scenarios.py --csv $(CSV) --host localhost --port 2000 \
-		--carla-config $(abspath $(CONFIG)) --sm-stack none
+		--carla-config $(abspath $(CONFIG))

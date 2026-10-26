@@ -274,48 +274,14 @@ def get_scenario_mapping():
 
     return mapping
 
-def sm_engage(sm, sm_cfg, name, config, ego, state):
-    """Hook B (after load_scenario, before the scenario ticks): power the system manager on and
-    hand it the scenario goal (XML <goal x= y= z=/>) as a GPS mission; the SM engages by itself.
-    urban: [goal]. offroad: dense lane route ego -> goal at sm_cfg['route_speed'], goal last."""
-    import carla
-    from srunner.scenariomanager.carla_data_provider import CarlaDataProvider
-    from sm_client import goal_waypoint
-    try:
-        sm.power_on()
-        goal = config.other_parameters.get('goal')
-        if not goal:
-            state['result'] = 'NO_GOAL'
-            return
-        goal = carla.Location(*(float(goal[k]) for k in ('x', 'y', 'z')))
-        cmap = CarlaDataProvider.get_map()
-        locs = [goal]
-        if sm_cfg['stack'] == 'offroad':
-            from agents.navigation.global_route_planner import GlobalRoutePlanner
-            route = GlobalRoutePlanner(cmap, 1.0).trace_route(ego.get_location(), goal)
-            locs = [wp.transform.location for wp, _ in route] + [goal]
-        wps = [goal_waypoint(cmap, loc, sm_cfg['origin'], f'g{i}') for i, loc in enumerate(locs)]
-        for wp in wps[:-1]:
-            wp.speed = sm_cfg['route_speed']
-        mission_id = f"{name}_{datetime.datetime.now():%Y%m%d_%H%M%S}"
-        print(f"[sm] mission {mission_id}: {len(wps)} waypoint(s), goal carla=({goal.x:.2f}, {goal.y:.2f}, {goal.z:.2f})")
-        sm.start_mission(wps, mission_id, total_laps=1, rtl_enabled=False,
-                         goal_reach_radius=sm_cfg['goal_radius'])
-    except Exception as e:
-        state['result'] = f'SM: {e}'
-        raise
-
-
-def run_scenario(name, details, extra_args, exec_timeout=600, recorder=None, sm=None, sm_cfg=None):
+def run_scenario(name, details, extra_args, exec_timeout=600, recorder=None):
     """
-    Executes a single scenario and returns (status, elapsed_time, sm_result).
+    Executes a single scenario and returns (status, elapsed_time).
     If a BagRecorder is given, it starts once the scenario is ticking and stops
-    when the run ends. If a SystemManagerClient is given, the SM is powered off
-    before the run (A), powered on + given the goal once the scenario is loaded (B)
-    and powered off again after it (C); sm_result is the mission outcome.
+    when the run ends.
     """
     if not details:
-        return "Not Found", 0.0, None
+        return "Not Found", 0.0
 
     # Build command arguments for scenario runner parser
     cmd_args = ["--waitForEgo", "--reloadWorld"]
@@ -345,8 +311,6 @@ def run_scenario(name, details, extra_args, exec_timeout=600, recorder=None, sm=
     start_time = time.time()
     runner = None
     result_status = "PASS"
-    sm_state = {'result': None}
-    sm_result = None
     
     # Configure signal alarm for execution timeout
     global _timed_out
@@ -355,12 +319,7 @@ def run_scenario(name, details, extra_args, exec_timeout=600, recorder=None, sm=
     signal.alarm(exec_timeout)
 
     try:
-        if sm is not None:
-            sm.shutdown()   # A — SM must be OFF before the bridge is cycled / world reloaded
         runner = ScenarioRunner(sr_args)
-        if sm is not None:
-            runner._on_scenario_loaded = lambda scenario, config: sm_engage(
-                sm, sm_cfg, name, config, runner.ego_vehicles[0], sm_state)
         # Keep the bridge active between scenarios; tearing it down per-run and
         # reactivating it without a world reload segfaults the CARLA server.
         # The batch does one final teardown after the whole CSV (see main()).
@@ -373,8 +332,6 @@ def run_scenario(name, details, extra_args, exec_timeout=600, recorder=None, sm=
         if _timed_out:
             print(f"Execution timed out after {exec_timeout} seconds.")
             result_status = "Time Out"
-        elif (sm_state['result'] or '').startswith('SM:'):
-            result_status = "Failed"   # hook B failed: the scenario never ran
         elif runner.manager and runner.manager.scenario:
             failure = False
             timeout = False
@@ -413,16 +370,9 @@ def run_scenario(name, details, extra_args, exec_timeout=600, recorder=None, sm=
             recorder.stop()
         if runner is not None:
             runner.destroy()
-        if sm is not None:
-            try:
-                mission = sm.shutdown()   # C — COMPLETED / ABORTED / FAILED
-                sm_result = sm_state['result'] or mission or 'NOT_COMPLETED'
-            except Exception as e:  # noqa: BLE001
-                sm_result = f'SM_ERROR: {e}'
-            print(f"[sm] result: {sm_result}")
 
     elapsed = time.time() - start_time
-    return result_status, elapsed, sm_result
+    return result_status, elapsed
 
 def final_bridge_teardown(extra_args):
     """Deactivate the ROS 2 bridge once after all scenarios have run.
@@ -463,12 +413,6 @@ def main():
                         help='Path to the CARLA interface config used to resolve topic names '
                              '(default: ../config/carla_interface_config.yaml)')
     parser.add_argument('--no-record', action='store_true', help='Disable ROS 2 bag recording')
-    parser.add_argument('--sm-stack', choices=['urban', 'offroad', 'none'], default='urban',
-                        help='Drive the Micropilot system manager per scenario: urban sends the goal, '
-                             'offroad a dense route to it; none disables it (default: urban)')
-    parser.add_argument('--sm-goal-radius', type=float, default=2.0, help='SetMission goal_reach_radius (m)')
-    parser.add_argument('--sm-route-speed', type=float, default=5.0,
-                        help='Offroad route waypoint speed (m/s); the goal gets 0')
 
     # Parse args separating known from forwarded args
     args, unknown_args = parser.parse_known_args()
@@ -495,19 +439,6 @@ def main():
         except Exception as e:
             print(f"Warning: bag recording disabled ({e})", file=sys.stderr)
             recording_enabled = False
-
-    # One system-manager client for the whole batch (after the recorder's rclpy.init()).
-    sm, sm_cfg = None, None
-    if args.sm_stack != 'none':
-        from sm_client import SystemManagerClient
-        with open(args.carla_config, 'r', encoding='utf-8') as f:
-            gc = (yaml.safe_load(f) or {})['global_coordinates']
-        sm_cfg = {'stack': args.sm_stack, 'goal_radius': args.sm_goal_radius,
-                  'route_speed': args.sm_route_speed,
-                  'origin': (gc['latitude'], gc['longitude'], gc.get('altitude', 0.0))}
-        sm = SystemManagerClient()
-        sm.wait_connected()
-        print(f"System manager connected ({sm.leaf}); stack={args.sm_stack}")
 
     # Load mapping of scenario names
     mapping = get_scenario_mapping()
@@ -563,17 +494,6 @@ def main():
             for r in rows:
                 r.append('')
 
-    # Ensure 'SM Result' column exists when the system manager is driven
-    sm_idx = None
-    if sm is not None:
-        try:
-            sm_idx = [h.lower().strip() for h in headers].index('sm result')
-        except ValueError:
-            headers.append('SM Result')
-            sm_idx = len(headers) - 1
-            for r in rows:
-                r.append('')
-
     total = len(rows)
     passed = 0
     failed = 0
@@ -615,14 +535,9 @@ def main():
                 bag_uri = os.path.join(bags_dir, f"{safe_name}_{stamp}")
                 recorder = BagRecorder(rec_topics, bag_opts, bag_uri)
 
-            status, elapsed, sm_result = run_scenario(scen_name, details, unknown_args,
-                                                      exec_timeout=args.exec_timeout, recorder=recorder,
-                                                      sm=sm, sm_cfg=sm_cfg)
-            print(f"Result: {status} (took {elapsed:.2f}s)" + (f", SM: {sm_result}" if sm else ""))
-            if sm_idx is not None:
-                while len(row) <= sm_idx:
-                    row.append('')
-                row[sm_idx] = sm_result
+            status, elapsed = run_scenario(scen_name, details, unknown_args,
+                                           exec_timeout=args.exec_timeout, recorder=recorder)
+            print(f"Result: {status} (took {elapsed:.2f}s)")
 
             if recorder is not None and recorder.started:
                 if status == "PASS":
@@ -650,10 +565,6 @@ def main():
             writer.writerow(headers)
             writer.writerows(rows)
 
-    # SM is OFF after the last run (hook C); stop its client before the bridge goes.
-    if sm is not None:
-        sm.close()
-
     # Bridge was kept active across scenarios; tear it down once now.
     final_bridge_teardown(unknown_args)
 
@@ -665,16 +576,10 @@ def main():
     print(f"  Failed:          {failed}")
     print(f"  Time Out:        {timeouts}")
     print(f"  Not Found:       {not_found}")
-    if sm_idx is not None:
-        sm_counts = {}
-        for r in rows:
-            if len(r) > sm_idx and r[sm_idx]:
-                sm_counts[r[sm_idx]] = sm_counts.get(r[sm_idx], 0) + 1
-        print(f"  SM Results:      {sm_counts}")
     print("="*40)
     print(f"Results written to: {output_csv}\n")
 
-    if recording_enabled or sm is not None:
+    if recording_enabled:
         try:
             import rclpy
             if rclpy.ok():

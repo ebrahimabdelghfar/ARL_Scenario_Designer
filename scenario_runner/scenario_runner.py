@@ -403,10 +403,10 @@ class ScenarioRunner(object):
         with open(file_name, 'w', encoding='utf-8') as fp:
             json.dump(criteria_dict, fp, sort_keys=False, indent=4)
 
-    # ROS 2 lifecycle node name used by the CARLA telemetry bridge.
+    # ROS 2 lifecycle node name of the CARLA bridge (override with CARLA_BRIDGE_NODE).
     # ScenarioRunner coordinates world reloads via lifecycle transitions
     # to prevent "Invalid session: no stream available" errors.
-    _BRIDGE_LIFECYCLE_NODE = "/micropilot_carla_bridge_node"
+    _BRIDGE_LIFECYCLE_NODE = os.environ.get("CARLA_BRIDGE_NODE", "/carla_bridge_node")
 
     @staticmethod
     def _ros2_lifecycle_set(node_name, transition, timeout=15):
@@ -609,7 +609,7 @@ class ScenarioRunner(object):
                 for p, r in zip(off_params, results[1:]):
                     if not r.successful:
                         print(f"[ScenarioRunner] WARNING: bridge rejected '{p.name}' ({r.reason}); "
-                              "its NPC traffic stays on — rebuild carla_telemetry_cpp")
+                              "its NPC traffic stays on")
                 if results and results[0].successful:
                     print(f"[ScenarioRunner] Parameter 'world_town' set to '{town}' successfully")
                     return True

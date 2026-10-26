@@ -77,13 +77,13 @@ SHORTCUTS_HTML = """
 
 GUIDE_CSS = """
 h1 { color: #E6EDF2; font-size: 20px; margin-bottom: 2px; }
-h2 { color: #5FB3CE; font-size: 15px; margin-top: 18px; margin-bottom: 4px; }
+h2 { color: #7CF0BE; font-size: 15px; margin-top: 18px; margin-bottom: 4px; }
 p, li, td { color: #E6EDF2; font-size: 13px; }
 .muted { color: #93A4B1; }
 .note { color: #F5A524; }
 code { color: #F0BE28; }
-a { color: #5FB3CE; text-decoration: none; }
-td.k { color: #5FB3CE; font-weight: bold; padding-right: 14px; }
+a { color: #7CF0BE; text-decoration: none; }
+td.k { color: #7CF0BE; font-weight: bold; padding-right: 14px; }
 """
 
 GUIDE_HTML = """
@@ -128,7 +128,7 @@ faint <b>&gt;</b> chevrons for travel direction, sidewalks, zebra crossings and 
 </ul>
 
 <a name="place"></a><h2>4. Placing objects</h2>
-<p>Choose a tool in the <b>PLACE</b> toolbar (or keys 1–8) — a blue hint appears at the top of the map — then
+<p>Choose a tool in the <b>PLACE</b> toolbar (or keys 1–8) — a green hint appears at the top of the map — then
 click the map. <b>Esc</b> or clicking the active tool again cancels.</p>
 <p>A click places the object exactly where you click; <b>snapping happens when you drag</b> it afterwards.
 Dragging always snaps (vehicles to lanes, pedestrians to sidewalks) — to put an object off the lane,
@@ -296,7 +296,7 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.setMinimumSize(1200, 700)
         self.resize(1440, 880)
-        self.setWindowIcon(QIcon(theme.LOGO_PATH))
+        self.setWindowIcon(QIcon(theme.logo_pixmap(64)))
 
         self._carla_client = carla_client
         self._carla_maps_dict = {}
@@ -439,7 +439,7 @@ class MainWindow(QMainWindow):
         logo = QLabel()
         logo.setPixmap(theme.logo_pixmap(28))
         bl.addWidget(logo)
-        title = QLabel("Scenario Designer")
+        title = QLabel("ARL Scenario Designer")
         title.setObjectName("brand")
         bl.addWidget(title)
         toolbar.addWidget(brand)
@@ -469,7 +469,7 @@ class MainWindow(QMainWindow):
         toolbar.addAction(self.export_action)
         export_btn = toolbar.widgetForAction(self.export_action)
         export_btn.setObjectName("primary")
-        export_btn.setIcon(theme.icon("export", "#FFFFFF"))
+        export_btn.setIcon(theme.icon("export", theme.T["on_brand"]))
         export_btn.style().unpolish(export_btn)
         export_btn.style().polish(export_btn)
 
@@ -584,7 +584,7 @@ class MainWindow(QMainWindow):
     def _update_title(self):
         label = os.path.basename(self._current_path) if self._current_path else self._project.name
         dirty = " *" if self._is_dirty() else ""
-        self.setWindowTitle(f"Micropolis Scenario Designer — {label}{dirty}")
+        self.setWindowTitle(f"ARL Scenario Designer — {label}{dirty}")
         self.undo_action.setEnabled(self._hist_idx > 0)
         self.redo_action.setEnabled(self._hist_idx < len(self._history) - 1)
 
@@ -1026,8 +1026,9 @@ class MainWindow(QMainWindow):
     def _show_about(self):
         box = QMessageBox(self)
         box.setWindowTitle("About")
-        box.setIconPixmap(theme.logo_pixmap(64, 12))
-        box.setText("<h3>Micropolis Scenario Designer</h3>"
+        box.setIconPixmap(theme.logo_pixmap(64))
+        box.setText("<h3>ARL Scenario Designer</h3>"
+                    "<p>The Autotronics Research Lab · Ain Shams University</p>"
                     "<p>Visual editor for CARLA ScenarioRunner scenarios: place the ego, NPCs, "
                     "pedestrians and triggers on the map, then export XML + Python + OpenSCENARIO.</p>")
         box.exec_()

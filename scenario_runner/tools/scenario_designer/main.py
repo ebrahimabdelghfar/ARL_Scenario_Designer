@@ -63,7 +63,7 @@ def main():
 
     # Create application
     app = QApplication(sys.argv)
-    app.setApplicationName("Micropolis Scenario Designer")
+    app.setApplicationName("ARL Scenario Designer")
     from .gui import theme
     theme.apply(app)
 
