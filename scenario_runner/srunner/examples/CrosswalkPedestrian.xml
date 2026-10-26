@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<scenarios>
+    <scenario name="CrosswalkPedestrian_1_FOG" type="CrosswalkPedestrian" town="Town10HD">
+        <weather cloudiness="90" precipitation="10" fog_density="80" sun_altitude_angle="45" />
+        <ego_vehicle x="-48.84" y="-17.07" z="0.1" yaw="90" model="vehicle.lincoln.mkz_2017" />
+        <other_actor x="0" y="0" z="0" yaw="0" model="walker.pedestrian.0001" />
+        <other_actor x="0" y="0" z="0" yaw="0" model="walker.pedestrian.0002" />
+        <other_actor x="0" y="0" z="0" yaw="0" model="walker.pedestrian.0004" />
+        <pedestrian_speed value="1.8" />
+        <trigger_distance value="15.0" />
+    </scenario>
+    
+    <scenario name="CrosswalkPedestrian_2_RAIN" type="CrosswalkPedestrian" town="Town10HD">
+        <weather cloudiness="90" precipitation="80" precipitation_deposits="50" wind_intensity="50" sun_azimuth_angle="0" sun_altitude_angle="15" />
+        <ego_vehicle x="-48.84" y="-17.07" z="0.1" yaw="90" model="vehicle.lincoln.mkz_2017" />
+        <other_actor x="0" y="0" z="0" yaw="0" model="walker.pedestrian.0001" />
+        <pedestrian_speed value="2.5" />
+        <trigger_distance value="10.0" />
+    </scenario>
+    
+    <scenario name="CrosswalkPedestrian_3_RAIN" type="CrosswalkPedestrian" town="Town10HD">
+        <weather cloudiness="90" precipitation="80" precipitation_deposits="50" wind_intensity="50" sun_azimuth_angle="0" sun_altitude_angle="15" />
+        <ego_vehicle x="-48.84" y="-17.07" z="0.1" yaw="90" model="vehicle.lincoln.mkz_2017" />
+        <other_actor x="0" y="0" z="0" yaw="0" model="walker.pedestrian.0011" />
+        <other_actor x="0" y="0" z="0" yaw="0" model="walker.pedestrian.0028" />    
+        <pedestrian_speed value="2.5" />
+        <trigger_distance value="10.0" />
+    </scenario>
+</scenarios>

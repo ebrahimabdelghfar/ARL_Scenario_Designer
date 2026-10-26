@@ -1,0 +1,9 @@
+<?xml version="1.0" ?>
+<scenarios>
+    <scenario name="MyScenario_tessss_1" type="MyScenario_tessss" town="Town10HD_Opt">
+        <ego_vehicle x="4.93" y="16.7" z="0.5" yaw="180.2" model="vehicle.lincoln.mkz_2017"/>
+        <other_actor x="-19.29" y="13.13" z="0.5" yaw="180.2" model="vehicle.tesla.model3" speed="10.0"/>
+        <other_actor x="-41.68" y="-37.8" z="0.5" yaw="90.0" model="vehicle.tesla.model3" speed="10.0"/>
+        <weather cloudiness="0.0" precipitation="0.0" precipitation_deposits="0.0" wind_intensity="0.0" sun_azimuth_angle="0.0" sun_altitude_angle="75.0"/>
+    </scenario>
+</scenarios>

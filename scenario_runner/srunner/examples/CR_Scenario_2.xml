@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+<scenarios>
+    <scenario name="CR_Scenario_2_1" type="CR_Scenario_2" town="Town10HD_Opt">
+        <ego_vehicle x="-8.4" y="13.16" z="0.5" yaw="180.2" model="vehicle.lincoln.mkz_2017"/>
+        <!-- system-manager mission goal (= EgoGoalCheck location) -->
+        <goal x="-43.06" y="-16.72" z="0.5" />
+        <other_actor x="-16.99" y="16.64" z="0.5" yaw="180.2" model="vehicle.tesla.model3" speed="10.0"/>
+        <other_actor x="-59.72" y="-9.23" z="0.5" yaw="89.7" model="walker.pedestrian.0003" speed="1.4" use_wheelchair="true"/>
+        <weather cloudiness="0.0" precipitation="0.0" precipitation_deposits="0.0" wind_intensity="0.0" sun_azimuth_angle="0.0" sun_altitude_angle="75.0"/>
+    </scenario>
+</scenarios>

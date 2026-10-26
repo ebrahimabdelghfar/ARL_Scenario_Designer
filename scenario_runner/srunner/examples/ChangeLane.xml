@@ -1,0 +1,146 @@
+<?xml version="1.0"?>
+<scenarios>
+    <!-- Town04: Classic 3-vehicle highway scenario -->
+    <scenario name="ChangeLane_1" type="ChangeLane" town="Town04">
+        <ego_vehicle x="284.4" y="16.4" z="2.5" yaw="-173" model="vehicle.lincoln.mkz_2017" />
+        <!-- system-manager mission goal: ego lane, 40 m past the furthest other_actor -->
+        <goal x="144.49" y="14.28" z="9.56" />
+        <!-- spawn actors-->
+        <other_actor x="264.4" y="16.3" z="-500" yaw="-179" model="vehicle.tesla.model3" />
+        <other_actor x="184.4" y="14.9" z="-500" yaw="-176" model="vehicle.volkswagen.t2" />
+        <weather cloudiness="0" precipitation="0" precipitation_deposits="0" wind_intensity="0" sun_azimuth_angle="0" sun_altitude_angle="75" />
+    </scenario>
+
+    <!-- Town04: Rainy, 3 other cars (tesla, volkswagen, audi), custom distances and slow speed -->
+    <scenario name="ChangeLane_Town04_Rainy_3Cars" type="ChangeLane" town="Town04">
+        <ego_vehicle x="284.4" y="16.4" z="2.5" yaw="-173" model="vehicle.lincoln.mkz_2017" />
+        <!-- system-manager mission goal: ego lane, 40 m past the furthest other_actor -->
+        <goal x="124.50" y="13.93" z="10.16" />
+        <!-- spawn actors-->
+        <other_actor x="264.4" y="16.3" z="-500" yaw="-179" model="vehicle.tesla.model3" />
+        <other_actor x="184.4" y="14.9" z="-500" yaw="-176" model="vehicle.volkswagen.t2" />
+        <other_actor x="164.4" y="14.9" z="-500" yaw="-176" model="vehicle.audi.tt" />
+        <weather cloudiness="80" precipitation="60" wind_intensity="30" sun_altitude_angle="15" />
+        <fast_vehicle_velocity value="60" />
+        <slow_vehicle_velocity value="5" />
+        <slow_vehicle_distance value="90,110" />
+        <lane_check value="false" />
+        <distance_lane_change value="35" />
+        <k_p value="0.5" />
+        <k_d value="0.05" />
+    </scenario>
+
+    <!-- Town04: Foggy, 4 other cars (tesla, volkswagen, audi, patrol), right-hand lane change -->
+    <scenario name="ChangeLane_Town04_Foggy_4Cars_Right" type="ChangeLane" town="Town04">
+        <ego_vehicle x="178" y="-395.8" z="2.5" yaw="180" model="vehicle.lincoln.mkz_2017" />
+        <!-- system-manager mission goal: ego lane, 40 m past the furthest other_actor -->
+        <goal x="10.42" y="-314.38" z="0.00" />
+        <!-- spawn actors-->
+        <other_actor x="158" y="-395.8" z="-500" yaw="180" model="vehicle.tesla.model3" />
+        <other_actor x="78" y="-395.8" z="-500" yaw="180" model="vehicle.volkswagen.t2" />
+        <other_actor x="58" y="-395.8" z="-500" yaw="180" model="vehicle.audi.tt" />
+        <other_actor x="38" y="-395.8" z="-500" yaw="180" model="vehicle.nissan.patrol" />
+        <weather cloudiness="90" precipitation="10" fog_density="80" sun_altitude_angle="45" />
+        <fast_vehicle_velocity value="50" />
+        <slow_vehicle_velocity value="3,2,0" />
+        <slow_vehicle_distance value="80,100,120" />
+        <direction value="right" />
+        <lane_check value="false" />
+        <distance_lane_change value="40" />
+        <k_p value="0.4" />
+        <k_d value="0.06" />
+    </scenario>
+
+    <!-- Town04: Night, 2 other cars, upper bypass highway spot -->
+    <scenario name="ChangeLane_Town04_Night_2Cars" type="ChangeLane" town="Town04">
+        <ego_vehicle x="-326.2" y="435.8" z="2.5" yaw="0" model="vehicle.lincoln.mkz_2017" />
+        <!-- system-manager mission goal: ego lane, 40 m past the furthest other_actor -->
+        <goal x="-184.71" y="435.15" z="0.00" />
+        <!-- spawn actors-->
+        <other_actor x="-306.2" y="435.8" z="-500" yaw="0" model="vehicle.tesla.model3" />
+        <other_actor x="-226.2" y="435.8" z="-500" yaw="0" model="vehicle.volkswagen.t2" />
+        <weather cloudiness="10" precipitation="0" sun_altitude_angle="-90" />
+        <fast_vehicle_velocity value="80" />
+        <slow_vehicle_velocity value="0" />
+        <slow_vehicle_distance value="100" />
+        <lane_check value="false" />
+        <distance_lane_change value="35" />
+        <k_p value="0.5" />
+        <k_d value="0.05" />
+    </scenario>
+
+    <!-- Town01: Sunny, standard 2 other cars scenario -->
+    <scenario name="ChangeLane_2" type="ChangeLane" town="Town01">
+        <ego_vehicle x="107" y="133.5" z="0.5" yaw="0" model="vehicle.lincoln.mkz_2017" />
+        <!-- system-manager mission goal: ego lane, 40 m past the furthest other_actor -->
+        <goal x="247.00" y="133.48" z="0.00" />
+        <!-- spawn actors-->
+        <other_actor x="127" y="133.5" z="-500" yaw="0" model="vehicle.tesla.model3" />
+        <other_actor x="207" y="133.5" z="-500" yaw="0" model="vehicle.volkswagen.t2" />
+        <weather cloudiness="0" precipitation="0" wind_intensity="0" sun_azimuth_angle="0" sun_altitude_angle="75" />
+        <fast_vehicle_velocity value="70" />
+        <slow_vehicle_velocity value="0" />
+        <lane_check value="false" />
+        <distance_lane_change value="35" />
+        <k_p value="0.5" />
+        <k_d value="0.0" />
+    </scenario>
+
+    <!-- Town01: Rainy, 3 other cars (tesla, volkswagen, audi), custom distances and slow speed -->
+    <scenario name="ChangeLane_2_Rainy_3Cars" type="ChangeLane" town="Town01">
+        <ego_vehicle x="107" y="133.5" z="0.5" yaw="0" model="vehicle.lincoln.mkz_2017" />
+        <!-- system-manager mission goal: ego lane, 40 m past the furthest other_actor -->
+        <goal x="267.00" y="133.49" z="0.00" />
+        <!-- spawn actors-->
+        <other_actor x="127" y="133.5" z="-500" yaw="0" model="vehicle.tesla.model3" />
+        <other_actor x="207" y="133.5" z="-500" yaw="0" model="vehicle.volkswagen.t2" />
+        <other_actor x="227" y="133.5" z="-500" yaw="0" model="vehicle.audi.tt" />
+        <weather cloudiness="80" precipitation="60" wind_intensity="30" sun_altitude_angle="15" />
+        <fast_vehicle_velocity value="50" />
+        <slow_vehicle_velocity value="5" />
+        <slow_vehicle_distance value="100,120" />
+        <lane_check value="false" />
+        <distance_lane_change value="35" />
+        <k_p value="0.5" />
+        <k_d value="0.05" />
+    </scenario>
+
+    <!-- Town01: Foggy, 4 other cars (tesla, volkswagen, audi, patrick), lower visibility, different speeds -->
+    <scenario name="ChangeLane_2_Foggy_4Cars" type="ChangeLane" town="Town01">
+        <ego_vehicle x="107" y="133.5" z="0.5" yaw="0" model="vehicle.lincoln.mkz_2017" />
+        <!-- system-manager mission goal: ego lane, 40 m past the furthest other_actor -->
+        <goal x="287.00" y="133.50" z="0.00" />
+        <!-- spawn actors-->
+        <other_actor x="127" y="133.5" z="-500" yaw="0" model="vehicle.tesla.model3" />
+        <other_actor x="207" y="133.5" z="-500" yaw="0" model="vehicle.volkswagen.t2" />
+        <other_actor x="227" y="133.5" z="-500" yaw="0" model="vehicle.audi.tt" />
+        <other_actor x="247" y="133.5" z="-500" yaw="0" model="vehicle.nissan.patrol" />
+        <weather cloudiness="90" precipitation="10" fog_density="80" sun_altitude_angle="45" />
+        <fast_vehicle_velocity value="60" />
+        <slow_vehicle_velocity value="3,2,0" />
+        <slow_vehicle_distance value="100,120,140" />
+        <trigger_distance value="25" />
+        <lane_check value="false" />
+        <distance_lane_change value="40" />
+        <k_p value="0.4" />
+        <k_d value="0.06" />
+    </scenario>
+
+    <!-- Town01: Night, 2 other cars, midnight sun angle -->
+    <scenario name="ChangeLane_2_Night_2Cars" type="ChangeLane" town="Town01">
+        <ego_vehicle x="107" y="133.5" z="0.5" yaw="0" model="vehicle.lincoln.mkz_2017" />
+        <!-- system-manager mission goal: ego lane, 40 m past the furthest other_actor -->
+        <goal x="247.00" y="133.48" z="0.00" />
+        <!-- spawn actors-->
+        <other_actor x="127" y="133.5" z="-500" yaw="0" model="vehicle.tesla.model3" />
+        <other_actor x="207" y="133.5" z="-500" yaw="0" model="vehicle.volkswagen.t2" />
+        <weather cloudiness="10" precipitation="0" sun_altitude_angle="-90" />
+        <fast_vehicle_velocity value="80" />
+        <slow_vehicle_velocity value="0" />
+        <slow_vehicle_distance value="90" />
+        <lane_check value="false" />
+        <distance_lane_change value="35" />
+        <k_p value="0.5" />
+        <k_d value="0.05" />
+    </scenario>
+</scenarios>

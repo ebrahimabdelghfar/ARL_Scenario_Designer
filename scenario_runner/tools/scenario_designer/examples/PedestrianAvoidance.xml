@@ -1,0 +1,9 @@
+<?xml version="1.0" ?>
+<scenarios>
+    <scenario name="PedestrianAvoidance_1" type="PedestrianAvoidance" town="Town03">
+        <ego_vehicle x="120" y="193" z="3" yaw="180" model="vehicle.lincoln.mkz_2017"/>
+        <other_actor x="95" y="193.2" z="3" yaw="180" model="vehicle.nissan.patrol" speed="8"/>
+        <other_actor x="100" y="200" z="0.5" yaw="270" model="walker.pedestrian.0003" speed="1.4"/>
+        <weather cloudiness="20" precipitation="0.0" precipitation_deposits="0.0" wind_intensity="0.0" sun_azimuth_angle="0.0" sun_altitude_angle="70"/>
+    </scenario>
+</scenarios>
